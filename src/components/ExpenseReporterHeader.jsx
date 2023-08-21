@@ -8,7 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-const ExpenseReporterHeader = () => {
+const ExpenseReporterHeader = ({showNewDashboard, setShowNewDashboard}) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const open = Boolean(menuOpen);
     const handleClick = (event) => {
@@ -17,6 +17,15 @@ const ExpenseReporterHeader = () => {
     const handleClose = () => {
         setMenuOpen(null);
     };
+    const handleCreateNewDashboard = () => {
+        if (showNewDashboard) {
+            setShowNewDashboard(false)
+            setMenuOpen(null);
+        } else {
+            setShowNewDashboard(true)
+            setMenuOpen(null);
+        }
+    }
 
     // Render menu items when hamburger menu is clicked
     const renderMenuItems = () => {
@@ -27,20 +36,12 @@ const ExpenseReporterHeader = () => {
                 anchorEl={menuOpen}
                 open={open}
                 onClose={handleClose}
-                // anchorOrigin={{
-                //     vertical: 'top',
-                //     horizontal: 'left',
-                // }}
-                // transformOrigin={{
-                //     vertical: 'top',
-                //     horizontal: 'left',
-                // }}
             >
-                <MenuItem>
+                <MenuItem >
                     Show Dashboards
                 </MenuItem>
-                <MenuItem>
-                    Create New Dashboard 
+                <MenuItem onClick={handleCreateNewDashboard}>
+                    Create New Dashboard
                 </MenuItem>
             </Menu>
         );
