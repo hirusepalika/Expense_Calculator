@@ -1,24 +1,26 @@
 import React, {useEffect, useState} from 'react';
-import {StyledLayout, StyledChart, ExpenseChartTitle, StyledOptionOne, StyledOptionTwo, StyledButtton} from './CreateNewDashboard.styled';
+import {StyledOptionOne, StyledOptionTwo, StyledButtton} from './CreateNewDashboard.styled';
 import { Box, Button, Card, CardContent, CardActions, Typography } from '@mui/material';
 import {FileUpload }from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
 
-const CreateNewDashboard = ({showNewDashboard, setShowNewDashboard}) => {
-    const [showOptions, setShowOptions] = useState(false);
-
-    useEffect(() => {
-        if (showNewDashboard) {
-            setShowOptions(true);
-        }
-    }, [showNewDashboard]);
+const CreateNewDashboard = () => {
+    console.log("am i even hereeee")
+    const [showOptions, setShowOptions] = useState(true);
+    const history = useNavigate();
 
     const handleUploadFileClick = () => {
         setShowOptions(false);
     };
 
-    const renderOptions = () => {
-        return (
-            <>
+    const handleCreateNewDashboard = () => {
+        history("/CreateNewDashboard")
+        setShowOptions(false);
+    };
+
+    return (
+        showOptions ? (
+            <>  
                 <div>
                     <StyledOptionOne>
                         <Card variant="outlined">
@@ -37,7 +39,7 @@ const CreateNewDashboard = ({showNewDashboard, setShowNewDashboard}) => {
                                 </Typography>
                             </CardContent>
                                 <CardActions>
-                                <Button variant="outlined">Create New Dashboard</Button>
+                                <Button variant="outlined" onClick={handleCreateNewDashboard}>Create New Dashboard</Button>
                                 </CardActions>
                         </Card>
                     </StyledOptionOne>
@@ -56,7 +58,7 @@ const CreateNewDashboard = ({showNewDashboard, setShowNewDashboard}) => {
                                     adjective
                                 </Typography> */}
                                 <Typography variant="body2">
-                                Through this option, you can generate expense chart and visualize expense table using an existing sheet.
+                                    Through this option, you can generate expense chart and visualize expense table using an existing sheet.
                                 </Typography>
                             </CardContent>
                                 <CardActions>
@@ -66,31 +68,8 @@ const CreateNewDashboard = ({showNewDashboard, setShowNewDashboard}) => {
                     </StyledOptionTwo>
                 </div>
             </>
-        );
-    }
-
-    return (
-        showOptions ? renderOptions() : 
-        <StyledLayout>
-            <span>
-                <ExpenseChartTitle
-                    required
-                    id="outlined-chart-title"
-                    label="Required"
-                    defaultValue="Untitled"
-                    // color="secondary"
-                    focused
-                    sx={{ input: { color: 'white' } }}
-                />
-            </span>
-            <br/>
-            <StyledChart
-                sx={{ boxShadow: 5, borderRight: 0, borderLeft: 0, borderTop: 1, borderBottom: 1 }}
-            >
-                HELLO
-            </StyledChart>
-        </StyledLayout>
-    );
+        ) : null
+    ); 
 }
 
 export default CreateNewDashboard;

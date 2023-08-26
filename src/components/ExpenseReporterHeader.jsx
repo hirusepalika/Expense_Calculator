@@ -7,10 +7,14 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useNavigate } from "react-router-dom";
 
-const ExpenseReporterHeader = ({showNewDashboard, setShowNewDashboard}) => {
+const ExpenseReporterHeader = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const open = Boolean(menuOpen);
+
+    const history = useNavigate();
+
     const handleClick = (event) => {
         setMenuOpen(event.currentTarget);
     };
@@ -18,13 +22,8 @@ const ExpenseReporterHeader = ({showNewDashboard, setShowNewDashboard}) => {
         setMenuOpen(null);
     };
     const handleCreateNewDashboard = () => {
-        if (showNewDashboard) {
-            setShowNewDashboard(false)
-            setMenuOpen(null);
-        } else {
-            setShowNewDashboard(true)
-            setMenuOpen(null);
-        }
+        history("/CreateNewDashboardOptions")
+        setMenuOpen(null);
     }
 
     // Render menu items when hamburger menu is clicked
