@@ -26,6 +26,11 @@ const ExpenseReporterHeader = () => {
         setMenuOpen(null);
     }
 
+    const handleHeaderTitleClick = () => {
+        history("/")
+        setMenuOpen(null);
+    }
+
     // Render menu items when hamburger menu is clicked
     const renderMenuItems = () => {
         return (
@@ -64,9 +69,14 @@ const ExpenseReporterHeader = () => {
                     <MenuIcon/>
                 </IconButton>
                 {renderMenuItems()}
-                <Typography variant="h6" className='header-title-style' component="div">
+                <Typography variant="h6" className='header-title-style' component="div" onClick={handleHeaderTitleClick}>
                     Expense Reporter
                 </Typography>
+                <Typography variant="subtitle2" className='header-title-style' component="div" onClick={handleHeaderTitleClick}>
+                    &nbsp;Your Financial Journey, Tracked, Analyzed, Perfected.
+                </Typography>
+                <div>
+                </div>
                 </Toolbar>
             </AppBar>
         </Box>

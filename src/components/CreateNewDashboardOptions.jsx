@@ -10,6 +10,7 @@ const CreateNewDashboard = () => {
     const history = useNavigate();
 
     const handleUploadFileClick = () => {
+        history("/UploadNewDashboard")
         setShowOptions(false);
     };
 
