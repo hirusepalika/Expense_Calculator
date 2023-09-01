@@ -5,7 +5,7 @@ import Modal from '@mui/material/Modal';
 import FileUpload from 'react-material-file-upload';
 import Alert from '@mui/material/Alert';
 import * as XLSX from 'xlsx';
-import { Bar } from 'react-chartjs-2';
+import BarChart from './RenderBarChart';
 
 const style = {
   position: 'absolute',
@@ -24,21 +24,39 @@ const UploadNewDashboard = () => {
     const [open, setOpen] = React.useState(true);
     const [files, setFiles] = useState([]);
     const [error, setError] = useState(false);
-    const [data, setData] = useState();
+    const [data, setData] = useState(undefined);
     // const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     
    
+    // useEffect( () => {
+    //     console.log("filessss ", files[0]);
+    //     if (files?.length > 0) {
+    //         const fileExtension = files[0]?.name?.substr(files[0]?.name?.lastIndexOf('.') + 1);
+    //         console.log("fileExtension", fileExtension);
+    //         if (!["csv", "xls", "xlsx"].includes(fileExtension)) {
+    //             setData({})
+    //             setError(true);
+    //         } else {
+    //             setData(readExcelFile());
+    //             setError(false);
+    //         }
+    //     }
+
+    // }, [files]);
+
     useEffect(() => {
-        console.log("filessss ", files[0]);
         if (files?.length > 0) {
             const fileExtension = files[0]?.name?.substr(files[0]?.name?.lastIndexOf('.') + 1);
-            console.log("fileExtension", fileExtension);
             if (!["csv", "xls", "xlsx"].includes(fileExtension)) {
-                setData({})
+                setData([])
                 setError(true);
             } else {
-                setData(readExcelFile());
+                const readData = async()=> {
+                    const dat = await readExcelFile()
+                    setData(dat);
+                }
+                readData()
                 setError(false);
             }
         }
@@ -55,148 +73,144 @@ const UploadNewDashboard = () => {
             header: 1,
             defval: "",
         });
-
+        
+        var ws = XLSX.utils.aoa_to_sheet(jsonData);
 
         console.log("hellooo", jsonData)
 
+        console.log("ws", ws)
 
-       return jsonData
+       return ws
     }
 
     const transformData = async (dat) => {
-        // const data = {
-        //     labels: ["Organic", "Sponsored", "Organic", "Sponsored"],
-        //     previousDate: {
-        //       label: "08/10/2019 - 09/30/2019",
-        //       dataSet: [10000, 150000, 10000, 150000]
-        //     },
-        //     currentDate: {
-        //       label: "10/01/2019 - 11/20/2019",
-        //       dataSet: [10000, 225000, 10000, 225000]
-        //     }
-        //   };
-        const finalStructure = {
-            labels: [], // months
-            // TODO: there needs to be an array of other columns -> categories
-        }
         const finalDat = await data;
-        console.log("daataa in ", finalDat)
-        for (let i = 0; i < finalDat?.length; i++) {
-            console.log("BRO")
-            for(let j = 0; j < finalDat[i]?.length; j++) {
-                if (i > 0 && j === 0) {
-                    finalStructure.labels.push(finalDat[i][j])
+        let categorySet = {};
+        let finalArr = [];
+        if (finalDat) {
+            console.log("finlal daa", finalDat)
+            Object.keys(finalDat)?.map(key => {
+                if (key.split('')[0] !== '!') {
+                    categorySet[key.split('')[0]] = [];
+                } 
+            });
+    
+            Object.keys(finalDat)?.map(key => {
+                const category = key.split('')[0];
+                if (category !== '!') {
+                    categorySet[category].push(finalDat[key].v);
                 }
-            }
+            });
+    
+            Object.keys(categorySet)?.map(key => {
+                finalArr.push(categorySet[key]);
+    
+            });
+    
         }
-
-        console.log("daataaaa", finalStructure)
-
-        return finalStructure;
-
+        
+        return finalArr;
     };
 
-    useEffect(() => {
-        if(data) transformData(data);
-    }, [data]);
-
-    
-
-
-    const renderBarChart = () => {
-        const transformedData = transformData(data);
-        return (
-            <Bar
-                pointStyle="star"
-                data={{
-                labels: transformedData.labels,
-                responsive: true,
-                offset: true,
-                datasets: [
-                    {
-                    label: "Mobile",
+    const buildDataset = (dat) => {
+        const arr = [];
+        dat?.forEach(element => {
+            arr.push(
+                {
+                    label: element[0],
                     pointStyle: "rectRounded",
-                    backgroundColor: "#6ED3FF",
+                    backgroundColor: `#${Math.floor(Math.random()*16777215).toString(16)}`,
                     barThickness: 40,
                     categoryPercentage: 1,
-                    data: data.previousDate.dataSet //From API
-                    },
-                    {
-                    label: "Desktop",
-                    backgroundColor: "#1497FF",
-                    barThickness: 40,
-                    categoryPercentage: 1,
-                    pointStyle: "triangle",
-                    data: data.currentDate.dataSet //From API
-                    }
-                ]
-                }}
-                height={220}
-                options={{
-                offsetGridLines: true,
-                drawTicks: true,
-                layout: {
-                    padding: {
-                    top: 30,
-                    right: 40,
-                    bottom: 40
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: "right",
-                    align: "start",
-                    labels: {
-                    usePointStyle: true
-                    }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    xAxes: [
-                    {
-                        stacked: true,
-                        ticks: {
-                        padding: 5
-                        },
-                        gridLines: {
-                        display: false
-                        }
-                    }
-                    ],
-                    yAxes: [
-                    {
-                        stacked: false,
-                        gridLines: {
-                        drawBorder: false
-                        },
-                        ticks: {
-                        beginAtZero: true,
-                        maxTicksLimit: 6,
-                        padding: 20,
-                        callback(n) {
-                            if (n < 1e3) return n;
-                            if (n >= 1e3) return +(n / 1e3).toFixed(1) + "K";
-                        }
-                        }
-                    }
-                    ]
+                    data: element.slice(1, element.length) //From API
                 }
-                }}
-            />
-        )
-    }
+            )
+        });
+        console.log("aarrrr", arr)
+        return arr;
+    } 
+
+
+    // const renderBarChart = async () => {
+    //     const transformedData = await transformData(data);
+    //     console.log("tranasformdfsdf", transformedData)
+    //     const labels = transformedData[0]?.slice(1, transformedData[0].length)
+    //     const dataSet = buildDataset(transformedData?.slice(1,transformedData.length))
+    //     return (
+    //         <Bar
+    //             pointStyle="star"
+    //             data={{
+    //                 labels: labels,
+    //                 responsive: true,
+    //                 offset: true,
+    //                 datasets: dataSet
+    //             }}
+    //             height={220}
+    //             options={{
+    //             offsetGridLines: true,
+    //             drawTicks: true,
+    //             layout: {
+    //                 padding: {
+    //                 top: 30,
+    //                 right: 40,
+    //                 bottom: 40
+    //                 }
+    //             },
+    //             legend: {
+    //                 display: true,
+    //                 position: "right",
+    //                 align: "start",
+    //                 labels: {
+    //                     usePointStyle: true
+    //                 }
+    //             },
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             scales: {
+    //                 xAxes: [
+    //                 {
+    //                     stacked: true,
+    //                     ticks: {
+    //                         padding: 5
+    //                     },
+    //                     gridLines: {
+    //                         display: false
+    //                     }
+    //                 }
+    //                 ],
+    //                 yAxes: [
+    //                 {
+    //                     stacked: false,
+    //                     gridLines: {
+    //                         drawBorder: false
+    //                     },
+    //                     ticks: {
+    //                         beginAtZero: true,
+    //                         maxTicksLimit: 6,
+    //                         padding: 20,
+    //                         callback(n) {
+    //                             if (n < 1e3) return n;
+    //                             if (n >= 1e3) return +(n / 1e3).toFixed(1) + "K";
+    //                         }
+    //                     }
+    //                 }
+    //                 ]
+    //             }
+    //             }}
+    //         />
+    //     )
+    // }
+
+    // const barChart = await renderBarChart;
     return (
         <div>
             {
-                // files.length !== 0 && !error ? 
-                // <Chart
-                //     options={{
-                //     data,
-                //     primaryAxis,
-                //     secondaryAxes,
-                //     }}
-                // /> :
+                files.length !== 0 && !error && data? 
+                    <BarChart
+                        data={data}
+                        transformedData={transformData}
+                        buildDataset={buildDataset}
+                    /> :
                 (
                     <Modal
                         open={open}
